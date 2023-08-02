@@ -8,10 +8,20 @@ import shlex
 import docker
 from .models import Submission
 from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
 
 class TaskListCreate(generics.ListCreateAPIView):
     serializer_class = TaskSerializer
-    @swagger_auto_schema(operation_description="Возвращает список всех задач или задач определенного препода.")
+    
+    prepod_uid_param = openapi.Parameter(
+        'prepod_uid', 
+        openapi.IN_QUERY,
+        description="UID преподавателя, для которого будут возвращены задачи.",
+        type=openapi.TYPE_STRING
+    )
+
+    @swagger_auto_schema(manual_parameters=[prepod_uid_param], operation_description="Возвращает список всех задач или задач определенного препода.")
     def get_queryset(self):
         """
         Возможность просмотра списка всех задач или задач определенного препода.
