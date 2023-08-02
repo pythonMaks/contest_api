@@ -17,4 +17,4 @@ class TaskSerializer(serializers.ModelSerializer):
 class SubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Submission
-        fields = ['id', 'task', 'code', 'status', 'created_at', 'updated_at', 'student', 'output', 'error']
+        fields = ['id', 'task', 'code']
