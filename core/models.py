@@ -7,7 +7,7 @@ class Task(models.Model):
     description = models.TextField()    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    prepod_uid = models.CharField(max_length=150)
+    prepod_uid = models.CharField(max_length=150, null=True)
 
         
     def __str__(self):
@@ -44,7 +44,7 @@ class Submission(models.Model):
     status = models.CharField(max_length=3, choices=STATUS_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    student_uid = models.CharField(max_length=150)
+    student_uid = models.CharField(max_length=150, null=True)
     output = models.JSONField(default=list, blank=True)
     error = models.JSONField(default=list, blank=True)
     def __str__(self):
