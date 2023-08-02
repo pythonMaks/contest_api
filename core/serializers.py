@@ -16,6 +16,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
 class SubmissionSerializer(serializers.ModelSerializer):
     status = serializers.CharField(required=False)
+    student = serializers.CharField(required=False)
     error = serializers.CharField(required=False)
     output = serializers.CharField(required=False)
     class Meta:
