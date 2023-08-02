@@ -15,6 +15,9 @@ class TaskSerializer(serializers.ModelSerializer):
 
 
 class SubmissionSerializer(serializers.ModelSerializer):
+    status = serializers.CharField(required=False)
+    error = serializers.CharField(required=False)
+    output = serializers.CharField(required=False)
     class Meta:
         model = Submission
-        fields = ['id', 'task', 'code']
+        fields = ['id', 'task', 'code', 'status', 'created_at', 'updated_at', 'student', 'output', 'error']
