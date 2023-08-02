@@ -58,5 +58,14 @@ headers = {
 response = requests.post(url, headers=headers, data=json.dumps(data))
 
 # Вывод ответа сервера
-print(response.status_code)
-print(response.json())
+if response.content:
+    print(response.content)
+else:
+    print("Ответ не содержит содержимого")
+
+# Попытка преобразования ответа в JSON только если ответ содержит контент
+if response.content:
+    try:
+        print(response.json())
+    except requests.exceptions.JSONDecodeError:
+        print("Не удалось декодировать ответ в JSON")

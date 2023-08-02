@@ -33,6 +33,7 @@ AUTH_USER_MODEL = 'users.User'
 INSTALLED_APPS = [
     'core',
     'users',
+    'rest_framework.authtoken',
     'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -51,6 +52,15 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
 
 ROOT_URLCONF = 'contest_api.urls'
 
