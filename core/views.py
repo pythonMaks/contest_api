@@ -6,35 +6,95 @@ from rest_framework.views import APIView
 import chardet
 import shlex
 import docker
+from .models import Submission
+from drf_yasg.utils import swagger_auto_schema
 
 class TaskListCreate(generics.ListCreateAPIView):
-    queryset = Task.objects.all()
     serializer_class = TaskSerializer
+    @swagger_auto_schema(operation_description="Возвращает список всех задач или задач определенного препода.")
+    def get_queryset(self):
+        """
+        Возможность просмотра списка всех задач или задач определенного препода.
+        """
+        prepod_uid = self.request.query_params.get('prepod_uid', None)
+        if prepod_uid is not None:
+            return Task.objects.filter(prepod_uid=prepod_uid)
+        else:
+            return Task.objects.all()
+    @swagger_auto_schema(operation_description="Создает новую задачу.")
+    def perform_create(self, serializer):
+        serializer.save(prepod_uid=self.request.user.uid)
 
-class TestListCreate(generics.ListCreateAPIView):
-    queryset = Test.objects.all()
-    serializer_class = TestSerializer
 
 class TaskDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
 
+
+class TestListCreate(generics.ListCreateAPIView):
+    serializer_class = TestSerializer
+    @swagger_auto_schema(operation_description="Возвращает тесты, связанные с конкретной задачей.")
+    def get_queryset(self):
+        """
+        Возвращает тесты, связанные с конкретной задачей.
+        """
+        task_id = self.kwargs['task_id']
+        return Test.objects.filter(task_id=task_id)
+
+
 class TestDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Test.objects.all()
     serializer_class = TestSerializer
 
+@swagger_auto_schema(operation_description="Возвращает список всех решений.")
+class SubmissionListView(generics.ListAPIView):
+    """
+    Возвращает список всех решений.
+    """
+    queryset = Submission.objects.all()
+    serializer_class = SubmissionSerializer
+    
 
+@swagger_auto_schema(operation_description="Возвращает список решений конкретного студента.")
+class StudentSubmissionListView(generics.ListAPIView):
+    """
+    Возвращает список решений конкретного студента.
+    """
+    
+    serializer_class = SubmissionSerializer
+    @swagger_auto_schema(operation_description="Возвращает список решений конкретного студента.")
+    def get_queryset(self):
+        """
+        Фильтрует решения по uid студента.
+        """
+        student_uid = self.kwargs['uid']
+        return Submission.objects.filter(student_uid=student_uid)
 
 class SubmissionCreateView(APIView):
     def post(self, request, format=None):
-        serializer = SubmissionSerializer(data=request.data)
-        if serializer.is_valid():
-            submission = serializer.save(student=request.user)
-            # Обработка кода и тестов, а также сохранение результатов
-            self.process_submission(submission, request.user)
+        id_token = request.META.get('HTTP_AUTHORIZATION')
+        if id_token:
+            # убираем префикс "Bearer " из заголовка
+            id_token = id_token[7:]
+            try:
+                # проверяем токен с помощью SDK Firebase Admin
+                decoded_token = auth.verify_id_token(id_token)
+            except ValueError:
+                # Если токен недействителен, возвращаем ошибку 401
+                return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
 
-            return Response(SubmissionSerializer(submission).data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            uid = decoded_token['uid']
+            serializer = SubmissionSerializer(data=request.data)
+            if serializer.is_valid():
+                submission = serializer.save(student_uid=uid) # теперь используем UID пользователя
+                self.process_submission(submission, uid)
+
+                return Response(SubmissionSerializer(submission).data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'error': 'No token provided'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    # остальная часть вашего кода
 
     def process_submission(self, submission, user):
         task = submission.task

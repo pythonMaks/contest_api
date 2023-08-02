@@ -1,5 +1,5 @@
 from django.db import models
-from users.models import User
+
 
 class Task(models.Model): 
     language = models.CharField(("language"), max_length=150, blank=True)
@@ -7,7 +7,7 @@ class Task(models.Model):
     description = models.TextField()    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    prepod = models.ForeignKey(User, on_delete=models.CASCADE)    
+    prepod_uid = models.CharField(max_length=150)
 
         
     def __str__(self):
@@ -44,12 +44,10 @@ class Submission(models.Model):
     status = models.CharField(max_length=3, choices=STATUS_CHOICES)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    student = models.ForeignKey(User, on_delete=models.CASCADE)    
+    student_uid = models.CharField(max_length=150)
     output = models.JSONField(default=list, blank=True)
     error = models.JSONField(default=list, blank=True)
     def __str__(self):
         return f'{self.id} - {self.task.name} - {self.get_status_display()}'
 
-    @classmethod
-    def student_has_submission_for(cls, student, task):
-        return cls.objects.filter(task=task, student=student).exists()
+    

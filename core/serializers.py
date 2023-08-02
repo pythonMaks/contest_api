@@ -11,14 +11,14 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = ['id', 'language', 'name', 'description', 'created_at', 'updated_at', 'prepod', 'tests']
+        fields = ['id', 'language', 'name', 'description', 'created_at', 'updated_at', 'prepod_uid', 'tests']
 
 
 class SubmissionSerializer(serializers.ModelSerializer):
     status = serializers.CharField(required=False)
-    student = serializers.CharField(required=False)
+    student_uid = serializers.CharField(required=False)
     error = serializers.CharField(required=False)
     output = serializers.CharField(required=False)
     class Meta:
         model = Submission
-        fields = ['id', 'task', 'code', 'status', 'created_at', 'updated_at', 'student', 'output', 'error']
+        fields = ['id', 'task', 'code', 'status', 'created_at', 'updated_at', 'student_uid', 'output', 'error']
