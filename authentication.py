@@ -4,7 +4,7 @@ import firebase_admin
 from firebase_admin import auth, credentials
 
 # Инициализация Firebase Admin SDK
-cred = credentials.Certificate('!!!!!!!!!')
+cred = credentials.Certificate('gamification-447b4-firebase-adminsdk-6l7sw-bf895158b2.json')
 default_app = firebase_admin.initialize_app(cred)
 
 class FirebaseAuthentication(BaseAuthentication):
