@@ -9,7 +9,7 @@ import docker
 from .models import Submission
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-
+from firebase_admin import auth, credentials
 
 class TaskListCreate(generics.ListCreateAPIView):
     serializer_class = TaskSerializer
@@ -108,7 +108,6 @@ class SubmissionCreateView(APIView):
 
     def process_submission(self, submission, user):
         task = submission.task
-        submission.prepod = submission.task.prepod
 
         test_cases = Test.objects.filter(task=task)  # получение всех тестов для этого задания                                
         passed = []   
@@ -145,7 +144,7 @@ class SubmissionCreateView(APIView):
         output_i, error_i, pass_flag = None, None, None
 
         if input_data and expected_output:   
-            output_i, error_i = execute_code(submission.code, task.language, input_data, user.username)
+            output_i, error_i = execute_code(submission.code, task.language, input_data, user)
             try:              
                 if isinstance(output_i, bytes):
                     encoding = chardet.detect(output_i)['encoding']
