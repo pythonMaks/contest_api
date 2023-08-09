@@ -10,8 +10,11 @@ from .models import Submission
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from firebase_admin import auth, credentials
+from rest_framework.permissions import IsAuthenticated
+
 
 class TaskListCreate(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = TaskSerializer
     
     prepod_uid_param = openapi.Parameter(
@@ -37,11 +40,13 @@ class TaskListCreate(generics.ListCreateAPIView):
 
 
 class TaskDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
 
 
 class TestListCreate(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = TestSerializer
     @swagger_auto_schema(operation_description="Возвращает тесты, связанные с конкретной задачей.")
     def get_queryset(self):
@@ -58,6 +63,7 @@ class TestDetail(generics.RetrieveUpdateDestroyAPIView):
 
 @swagger_auto_schema(operation_description="Возвращает список всех решений.")
 class SubmissionListView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
     """
     Возвращает список всех решений.
     """
@@ -67,6 +73,7 @@ class SubmissionListView(generics.ListAPIView):
 
 @swagger_auto_schema(operation_description="Возвращает список решений конкретного студента.")
 class StudentSubmissionListView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
     """
     Возвращает список решений конкретного студента.
     """
@@ -81,6 +88,7 @@ class StudentSubmissionListView(generics.ListAPIView):
         return Submission.objects.filter(student_uid=student_uid)
 
 class SubmissionCreateView(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self, request, format=None):
         id_token = request.META.get('HTTP_AUTHORIZATION')
         if id_token:
