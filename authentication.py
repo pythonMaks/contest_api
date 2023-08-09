@@ -2,7 +2,7 @@ from rest_framework.authentication import BaseAuthentication
 from rest_framework import exceptions
 import firebase_admin
 from firebase_admin import auth, credentials
-from users.models import User
+
 # Инициализация Firebase Admin SDK
 cred = credentials.Certificate('gamification-447b4-firebase-adminsdk-6l7sw-bf895158b2.json')
 default_app = firebase_admin.initialize_app(cred)
@@ -29,5 +29,5 @@ class FirebaseAuthentication(BaseAuthentication):
         try:
             user = User.objects.get(uid=uid)
         except User.DoesNotExist:
-            user = None
+            user, created = User.objects.get_or_create(uid=uid, defaults={'username': uid})
         return user
