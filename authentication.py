@@ -26,4 +26,8 @@ class FirebaseAuthentication(BaseAuthentication):
 
     def get_user(self, decoded_token):
         uid = decoded_token['uid']
-        return uid
+        try:
+            user = User.objects.get(uid=uid)
+        except User.DoesNotExist:
+            user = None
+        return user
