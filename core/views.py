@@ -191,8 +191,28 @@ def execute_code(code, language, input_data, user, expected_output=None):
                         f'javac /code/Main.java && '
                         f'java -cp /code Main < /code/input.txt')
     elif language == 'node':
-        assert_code = f"const assert = require('assert'); const expectedOutput = {shlex.quote(expected_output)}; assert.strictEqual({code}, expectedOutput);"
+        if input_data.startswith('[') and input_data.endswith(']'):
+            input_arg = f"JSON.parse({shlex.quote(input_data)})"
+        elif input_data.startswith('"') and input_data.endswith('"'):
+            input_arg = shlex.quote(input_data)
+        else:
+            # Попытка интерпретировать как число
+            try:
+                float(input_data)  # Проверка, является ли строка числом
+                input_arg = input_data
+            except ValueError:
+                raise ValueError(f"Unsupported input format: {input_data}")
+                
+        assert_code = (
+            f"{code}"
+            f"const inputData = {input_arg};"
+            f"const result = Main(inputData);"  # замените 'yourFunctionName' на имя вашей функции
+            f"const expectedOutput = {shlex.quote(expected_output)};"
+            "const assert = require('assert');"
+            "assert.strictEqual(JSON.stringify(result), expectedOutput);"
+        )
         code_command = f'node -e {shlex.quote(assert_code)}'
+    
 
     elif language == 'kotlinc':
         code_command = (f'echo {shlex.quote(code)} > /code/Main.kt && '
