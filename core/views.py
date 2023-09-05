@@ -206,7 +206,7 @@ def execute_code(code, language, input_data, user, expected_output=None):
         execution_code = (
             f"{code}"
             f"const inputData = {input_arg};"
-            f"const result = yourFunctionName(inputData);"  # замените 'yourFunctionName' на имя вашей функции
+            f"const result = Main(inputData);"  # замените 'yourFunctionName' на имя вашей функции
             "console.log(JSON.stringify(result));"
         )
         code_command = f'node -e {shlex.quote(execution_code)}'
