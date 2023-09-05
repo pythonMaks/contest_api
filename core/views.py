@@ -152,7 +152,7 @@ class SubmissionCreateView(APIView):
         output_i, error_i, pass_flag = None, None, None
 
         if input_data and expected_output:   
-            output_i, error_i = execute_code(submission.code, task.language, input_data, user)
+            output_i, error_i = execute_code(submission.code, task.language, input_data, user, expected_output)
             try:              
                 if isinstance(output_i, bytes):
                     encoding = chardet.detect(output_i)['encoding']
@@ -171,7 +171,7 @@ class SubmissionCreateView(APIView):
         return output_i, error_i, pass_flag
     
     
-def execute_code(code, language, input_data, user):
+def execute_code(code, language, input_data, user, expected_output=None):
     if 'import' in code:
         return 'Import forbidden', ''
     client = docker.from_env()
