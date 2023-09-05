@@ -191,7 +191,9 @@ def execute_code(code, language, input_data, user):
                         f'javac /code/Main.java && '
                         f'java -cp /code Main < /code/input.txt')
     elif language == 'node':
-        code_command = f'node -e {shlex.quote(code)} < /code/input.txt'
+        assert_code = f"const assert = require('assert'); const expectedOutput = {shlex.quote(expected_output)}; assert.strictEqual({code}, expectedOutput);"
+        code_command = f'node -e {shlex.quote(assert_code)}'
+
     elif language == 'kotlinc':
         code_command = (f'echo {shlex.quote(code)} > /code/Main.kt && '
                         f'kotlinc /code/Main.kt -include-runtime -d /code/main.jar && '
@@ -200,7 +202,8 @@ def execute_code(code, language, input_data, user):
     else:
         raise ValueError(f'Unsupported language: {language}')
 
-    input_data_command = f'echo {shlex.quote(input_data)} > /code/input.txt; {code_command}; rm -rf /code/*'
+    input_data_command = f'{code_command}; rm -rf /code/*'
+
 
     container = client.containers.run(image_name,
                                       volumes={volume_name: {'bind': '/code', 'mode': 'rw'}},
